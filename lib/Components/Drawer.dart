@@ -10,6 +10,7 @@ import '../Pages/Favorite/FavoriteView.dart';
 import '../Pages/History/HistoryView.dart';
 import '../Pages/Settings/SettingsView.dart';
 import '../Pages/Stat/StatView.dart';
+import '../Pages/Notes/NotesView.dart';
 import '../Resources/Config.dart';
 import '../Utils/SettingsUtil.dart';
 import '../Utils/VersionUtil.dart';
@@ -59,6 +60,11 @@ class MDrawer extends StatelessWidget {
             title: Text(S.of(context).his_title),
             trailing: const Icon(Icons.history),
             onTap: () => Get.to(() => const HistoryView()),
+          ),
+          ListTile(
+            title: Text(S.of(context).notes_title),
+            trailing: const Icon(Icons.note),
+            onTap: () => Get.to(() => const NotesView()),
           ),
           ListTile(
             title: Text(S.of(context).settings_title),

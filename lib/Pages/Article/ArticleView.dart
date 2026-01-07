@@ -8,9 +8,13 @@ import '../Settings/SettingsProvider.dart';
 import '../../Components/ArticleList.dart';
 import '../../Components/SnackBar.dart';
 import '../../Components/Markdown.dart';
+import '../../Components/NoteDialog.dart';
 import '../../Models/Db/DbHelper.dart';
+import '../../Models/NoteProvider.dart';
 import '../../Utils/UmengUtil.dart';
 import '../../Utils/URLUtil.dart';
+import 'dart:math';
+import 'package:flutter/services.dart';
 
 class ArticleView extends StatefulWidget {
   final Article article;
@@ -35,11 +39,92 @@ class _ArticleViewState extends State<ArticleView> {
   late bool isFavorite;
   bool isPlaying = false;
   final player = AudioPlayer();
+  
+  final NoteProvider _noteProvider = NoteProvider();
+  List<Note> _notes = [];
+  String? _selectedText;
+  int? _selectedStartOffset;
+  int? _selectedEndOffset;
 
   @override
   void initState() {
     actualArticle = article = widget.article;
+    _loadNotes();
     super.initState();
+  }
+
+  Future<void> _loadNotes() async {
+    final notes = await _noteProvider.getNotesByArticleId(article.id);
+    setState(() {
+      _notes = notes;
+    });
+  }
+
+  Future<void> _handleTextSelection(String selectedText, int startOffset, int endOffset) async {
+    setState(() {
+      _selectedText = selectedText;
+      _selectedStartOffset = startOffset;
+      _selectedEndOffset = endOffset;
+    });
+    
+    // 检查是否已有笔记覆盖这个位置
+    Note? existingNote;
+    for (var note in _notes) {
+      if (note.startOffset <= startOffset && note.endOffset >= endOffset) {
+        existingNote = note;
+        break;
+      }
+    }
+
+    final result = await showDialog(
+      context: context,
+      builder: (context) => NoteDialog(
+        note: existingNote,
+        selectedText: selectedText,
+        articleId: article.id,
+        articleTitle: article.title,
+      ),
+    );
+
+    if (result == null) return;
+
+    if (result == true && existingNote != null) {
+      // 删除笔记
+      await _noteProvider.deleteNote(existingNote.id);
+      MSnackBar.showSnackBar(S.of(context).note_deleted_toast, "");
+      await _loadNotes();
+      return;
+    }
+
+    if (result is Map) {
+      final noteContent = result['noteContent'] as String;
+      final color = result['color'] as String;
+
+      if (existingNote != null) {
+        // 更新笔记
+        existingNote.noteContent = noteContent;
+        existingNote.color = color;
+        await _noteProvider.updateNote(existingNote);
+        MSnackBar.showSnackBar(S.of(context).note_updated_toast, "");
+      } else {
+        // 创建新笔记
+        final note = Note(
+          id: DateTime.now().millisecondsSinceEpoch.toString() + Random().nextInt(1000).toString(),
+          articleId: article.id,
+          articleTitle: article.title,
+          selectedText: selectedText,
+          noteContent: noteContent,
+          startOffset: startOffset,
+          endOffset: endOffset,
+          color: color,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+        await _noteProvider.addNote(note);
+        MSnackBar.showSnackBar(S.of(context).note_added_toast, "");
+      }
+      await _loadNotes();
+    }
   }
 
   @override
@@ -278,7 +363,53 @@ class _ArticleViewState extends State<ArticleView> {
                     onPressed: () async {
                       await URLUtil.openUrl(article.zhihuLink, context);
                     })
-                : Container()
+                : Container(),
+            IconButton(
+              icon: Icon(
+                Icons.note_add,
+                semanticLabel: S.of(context).add_note,
+              ),
+              onPressed: () async {
+                // 显示输入对话框让用户输入要标注的文本
+                final textController = TextEditingController();
+                final result = await showDialog<String>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text(S.of(context).add_note),
+                    content: TextField(
+                      controller: textController,
+                      decoration: InputDecoration(
+                        labelText: '请输入要标注的文本',
+                        hintText: '可以从文章中复制文本后粘贴到这里',
+                      ),
+                      maxLines: 3,
+                      autofocus: true,
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text(S.of(context).cancel),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (textController.text.isNotEmpty) {
+                            Navigator.of(context).pop(textController.text);
+                          }
+                        },
+                        child: Text(S.of(context).ok),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (result != null && result.isNotEmpty) {
+                  final fullContent = '# ${article.title}\n    作者: ${article.author} 最近更新: ${article.lastUpdate}\n\n${article.question == "" ? "" : ">${article.question}\n\n"}${article.content}';
+                  final startOffset = fullContent.indexOf(result);
+                  final endOffset = startOffset != -1 ? startOffset + result.length : result.length;
+                  _handleTextSelection(result, startOffset != -1 ? startOffset : 0, endOffset);
+                }
+              },
+            ),
           ],
         ),
         body: Scrollbar(
@@ -290,8 +421,7 @@ class _ArticleViewState extends State<ArticleView> {
             children: [
               Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: MMarkdown(
-                      '# ${article.title}\n    作者: ${article.author} 最近更新: ${article.lastUpdate}\n\n${article.question == "" ? "" : ">${article.question}\n\n"}${article.content}')),
+                  child: _buildMarkdownWithNotes()),
               // '# ${article.title}\n${article.zhihuLink == "" ? article.question : "[${article.question}](${article.zhihuLink})"}\n\n> 最后更新: ${article.lastUpdate}\n\n${article.content}')),
               // child: MMarkdown(article.content)),
               getArticleWidget(S.of(context).pre_article, getPreArticle()),
@@ -323,8 +453,143 @@ class _ArticleViewState extends State<ArticleView> {
                         : Container();
                   }),
               const Padding(padding: EdgeInsets.all(5.0)),
+              // 笔记列表
+              if (_notes.isNotEmpty) _buildNotesSection(),
             ],
           ),
         )));
+  }
+
+  Widget _buildMarkdownWithNotes() {
+    final fullContent = '# ${article.title}\n    作者: ${article.author} 最近更新: ${article.lastUpdate}\n\n${article.question == "" ? "" : ">${article.question}\n\n"}${article.content}';
+    
+    return GestureDetector(
+      onLongPress: () {
+        // 长按提示用户选择文本
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('请选择文本后，使用右上角的笔记按钮添加笔记'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      },
+      child: SelectionArea(
+        child: MMarkdown(fullContent),
+      ),
+    );
+  }
+
+  Widget _buildNotesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(padding: EdgeInsets.all(5.0)),
+        ListTile(
+          title: Text('${S.of(context).notes_title} (${_notes.length})'),
+          leading: const Icon(Icons.note),
+        ),
+        const Divider(height: 1),
+        ..._notes.map((note) => _buildNoteItem(note)),
+        const Padding(padding: EdgeInsets.all(5.0)),
+      ],
+    );
+  }
+
+  Widget _buildNoteItem(Note note) {
+    Color _hexToColor(String hex) {
+      final hexCode = hex.replaceAll('#', '');
+      return Color(int.parse('FF$hexCode', radix: 16));
+    }
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: ListTile(
+        leading: Container(
+          width: 4,
+          height: double.infinity,
+          color: _hexToColor(note.color),
+        ),
+        title: Text(
+          note.selectedText,
+          style: TextStyle(
+            backgroundColor: _hexToColor(note.color).withOpacity(0.2),
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: note.noteContent.isNotEmpty
+            ? Text(
+                note.noteContent,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              )
+            : null,
+        trailing: IconButton(
+          icon: const Icon(Icons.edit),
+          onPressed: () async {
+            final result = await showDialog(
+              context: context,
+              builder: (context) => NoteDialog(
+                note: note,
+                selectedText: note.selectedText,
+                articleId: article.id,
+                articleTitle: article.title,
+              ),
+            );
+
+            if (result == true) {
+              // 删除
+              await _noteProvider.deleteNote(note.id);
+              MSnackBar.showSnackBar(S.of(context).note_deleted_toast, "");
+              await _loadNotes();
+            } else if (result is Map) {
+              // 更新
+              note.noteContent = result['noteContent'] as String;
+              note.color = result['color'] as String;
+              await _noteProvider.updateNote(note);
+              MSnackBar.showSnackBar(S.of(context).note_updated_toast, "");
+              await _loadNotes();
+            }
+          },
+        ),
+        onTap: () async {
+          // 显示完整笔记
+          await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(S.of(context).notes_title),
+              content: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      note.selectedText,
+                      style: TextStyle(
+                        backgroundColor: _hexToColor(note.color).withOpacity(0.2),
+                        fontSize: 16,
+                      ),
+                    ),
+                    if (note.noteContent.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      Text(
+                        note.noteContent,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(S.of(context).ok),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
   }
 }

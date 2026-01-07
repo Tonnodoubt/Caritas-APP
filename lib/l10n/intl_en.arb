@@ -89,5 +89,30 @@
   "stat_sumWords": "Sum Words",
   "stat_sumArticles": "Sum Articles",
   "stat_words": "Words",
-  "stat_articles": "Articles"
+  "stat_articles": "Articles",
+
+  "notes_title": "Notes",
+  "notes_empty": "No notes yet. Add one now!",
+  "notes_search_hint": "Search notes...",
+  "add_note": "Add Note",
+  "edit_note": "Edit Note",
+  "delete": "Delete",
+  "save": "Save",
+  "add": "Add",
+  "selected_text": "Selected Text",
+  "note_content": "Note Content",
+  "note_content_hint": "Write your thoughts...",
+  "highlight_color": "Highlight Color",
+  "note_added_toast": "Note added",
+  "note_updated_toast": "Note updated",
+  "note_deleted_toast": "Note deleted",
+  "note_list_title": "My Notes",
+  "note_from_article": "From article: {articleTitle}",
+  "@note_from_article": {
+    "placeholders": {
+      "articleTitle": {
+        "type": "String"
+      }
+    }
+  }
 }

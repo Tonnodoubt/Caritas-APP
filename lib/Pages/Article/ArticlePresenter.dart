@@ -46,4 +46,13 @@ class ArticlePresenter {
   setAsRead(Article article) {
     SettingsProvider().setHistories(article.id);
   }
+
+  Future<Article?> getArticleById(String articleId) async {
+    Box aBox = Hive.box("articles");
+    List<Article> articles = aBox.values
+        .where((article) => article.id == articleId)
+        .toList()
+        .cast();
+    return articles.isNotEmpty ? articles.first : null;
+  }
 }

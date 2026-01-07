@@ -100,3 +100,64 @@ class ArticleAdapter extends TypeAdapter<Article> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class NoteAdapter extends TypeAdapter<Note> {
+  @override
+  final int typeId = 2;
+
+  @override
+  Note read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return Note(
+      id: fields[0] as String,
+      articleId: fields[1] as String,
+      articleTitle: fields[2] as String,
+      selectedText: fields[3] as String,
+      noteContent: fields[4] as String,
+      startOffset: fields[5] as int,
+      endOffset: fields[6] as int,
+      color: fields[7] as String,
+      createdAt: fields[8] as DateTime,
+      updatedAt: fields[9] as DateTime,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, Note obj) {
+    writer
+      ..writeByte(10)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.articleId)
+      ..writeByte(2)
+      ..write(obj.articleTitle)
+      ..writeByte(3)
+      ..write(obj.selectedText)
+      ..writeByte(4)
+      ..write(obj.noteContent)
+      ..writeByte(5)
+      ..write(obj.startOffset)
+      ..writeByte(6)
+      ..write(obj.endOffset)
+      ..writeByte(7)
+      ..write(obj.color)
+      ..writeByte(8)
+      ..write(obj.createdAt)
+      ..writeByte(9)
+      ..write(obj.updatedAt);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NoteAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

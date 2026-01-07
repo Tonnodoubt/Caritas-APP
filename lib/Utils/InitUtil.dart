@@ -19,6 +19,7 @@ class InitUtil {
     await GetStorage.init();
     Hive.registerAdapter(ArticleAdapter());
     Hive.registerAdapter(CategoryAdapter());
+    Hive.registerAdapter(NoteAdapter());
     await Hive.initFlutter();
     await initBox();
     UmengUtil.init();

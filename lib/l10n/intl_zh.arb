@@ -89,5 +89,30 @@
   "stat_sumWords": "统计字数",
   "stat_sumArticles": "统计文章数",
   "stat_words": "字数",
-  "stat_articles": "文章"
+  "stat_articles": "文章",
+
+  "notes_title": "笔记",
+  "notes_empty": "还没有笔记，快去添加吧！",
+  "notes_search_hint": "搜索笔记...",
+  "add_note": "添加笔记",
+  "edit_note": "编辑笔记",
+  "delete": "删除",
+  "save": "保存",
+  "add": "添加",
+  "selected_text": "选中的文本",
+  "note_content": "笔记内容",
+  "note_content_hint": "写下你的想法...",
+  "highlight_color": "高亮颜色",
+  "note_added_toast": "笔记已添加",
+  "note_updated_toast": "笔记已更新",
+  "note_deleted_toast": "笔记已删除",
+  "note_list_title": "我的笔记",
+  "note_from_article": "来自文章：{articleTitle}",
+  "@note_from_article": {
+    "placeholders": {
+      "articleTitle": {
+        "type": "String"
+      }
+    }
+  }
 }

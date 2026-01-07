@@ -77,3 +77,74 @@ class Article extends HiveObject {
         // lastUpdate = json['lastupdate'] ?? '';
         lastUpdate = json['lastUpdate'] ?? '';
 }
+
+@HiveType(typeId: 2)
+class Note extends HiveObject {
+  @HiveField(0)
+  String id;
+
+  @HiveField(1)
+  String articleId;
+
+  @HiveField(2)
+  String articleTitle;
+
+  @HiveField(3)
+  String selectedText;
+
+  @HiveField(4)
+  String noteContent;
+
+  @HiveField(5)
+  int startOffset;
+
+  @HiveField(6)
+  int endOffset;
+
+  @HiveField(7)
+  String color;
+
+  @HiveField(8)
+  DateTime createdAt;
+
+  @HiveField(9)
+  DateTime updatedAt;
+
+  Note({
+    required this.id,
+    required this.articleId,
+    required this.articleTitle,
+    required this.selectedText,
+    required this.noteContent,
+    required this.startOffset,
+    required this.endOffset,
+    this.color = '#FFFF00',
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  Note.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        articleId = json['articleId'],
+        articleTitle = json['articleTitle'],
+        selectedText = json['selectedText'],
+        noteContent = json['noteContent'],
+        startOffset = json['startOffset'],
+        endOffset = json['endOffset'],
+        color = json['color'] ?? '#FFFF00',
+        createdAt = DateTime.parse(json['createdAt']),
+        updatedAt = DateTime.parse(json['updatedAt']);
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'articleId': articleId,
+        'articleTitle': articleTitle,
+        'selectedText': selectedText,
+        'noteContent': noteContent,
+        'startOffset': startOffset,
+        'endOffset': endOffset,
+        'color': color,
+        'createdAt': createdAt.toIso8601String(),
+        'updatedAt': updatedAt.toIso8601String(),
+      };
+}
