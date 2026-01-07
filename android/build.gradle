@@ -36,3 +36,35 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+// === 复制并替换文件末尾的代码 ===
+
+subprojects {
+    // 定义一个闭包（任务逻辑）
+    def fixNamespace = {
+        if (project.hasProperty("android")) {
+            project.android {
+                if (namespace == null) {
+                    // 读取 Manifest 文件中的 package
+                    def manifestFile = project.file('src/main/AndroidManifest.xml')
+                    if (manifestFile.exists()) {
+                        def manifest = new XmlSlurper().parse(manifestFile)
+                        def packageName = manifest.@package.text()
+                        if (packageName) {
+                            namespace packageName
+                            println "✅ Auto-fixed namespace '${packageName}' for ${project.name}"
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // 智能判断：如果项目已经加载完，直接执行；否则等它加载完再执行
+    if (project.state.executed) {
+        fixNamespace()
+    } else {
+        project.afterEvaluate {
+            fixNamespace()
+        }
+    }
+}
