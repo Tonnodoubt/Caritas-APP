@@ -1,5 +1,6 @@
 buildscript {
-    ext.kotlin_version = '1.6.10'
+    // 1. 把 Kotlin 版本升上来（为了兼容 Gradle 8.5）
+    ext.kotlin_version = '1.9.22'
     repositories {
         maven { url 'https://maven.aliyun.com/repository/google' }
         maven { url 'https://maven.aliyun.com/repository/jcenter' }
@@ -9,7 +10,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.2'
+        classpath 'com.android.tools.build:gradle:8.2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }

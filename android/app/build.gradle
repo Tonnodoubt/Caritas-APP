@@ -32,6 +32,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+    namespace "top.idealclover.caritas"
     // qr_code_scanner need this
     compileSdkVersion 33
     ndkVersion flutter.ndkVersion
