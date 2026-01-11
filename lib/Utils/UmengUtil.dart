@@ -10,10 +10,25 @@ class UmengUtil {
 
   static init() {
     if (!_isMobile) return;
-    UmengCommonSdk.initCommon(
-        Config.umengAndroidKey, Config.umengiOSKey, Config.umengChannel);
-    UmengCommonSdk.setPageCollectionModeAuto();
-    UmengPushSdk.register(Config.umengiOSKey, Config.umengChannel);
+    
+    try {
+      // 检查配置是否有效（不是占位符）
+      if (Config.umengAndroidKey == "android_key_placeholder" || 
+          Config.umengiOSKey == "ios_key_placeholder") {
+        print('Umeng 配置为占位符，跳过初始化');
+        return;
+      }
+      
+      UmengCommonSdk.initCommon(
+          Config.umengAndroidKey, Config.umengiOSKey, Config.umengChannel);
+      UmengCommonSdk.setPageCollectionModeAuto();
+      UmengPushSdk.register(Config.umengiOSKey, Config.umengChannel);
+      print('Umeng 初始化成功');
+    } catch (e, stackTrace) {
+      print('Umeng 初始化失败: $e');
+      print('堆栈跟踪: $stackTrace');
+      // 不抛出异常，允许应用继续运行
+    }
   }
 
   static onEvent(String event, Map<String, dynamic> properties) {

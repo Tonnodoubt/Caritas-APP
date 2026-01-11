@@ -23,13 +23,17 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m0(link) =>
       "> 扫描二维码导入记录\n> 或通过访问 [链接](${link}) 下载记录\n> 有效期一周，扫描一次后过期\n> 使用公共服务file.io";
 
-  static String m1(version) => "当前版本 v${version}";
+  static String m1(articleTitle) => "来自文章：${articleTitle}";
 
-  static String m2(version) => "v${version}";
+  static String m2(version) => "当前版本 v${version}";
+
+  static String m3(version) => "v${version}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "about_title": MessageLookupByLibrary.simpleMessage("关于"),
+        "add": MessageLookupByLibrary.simpleMessage("添加"),
+        "add_note": MessageLookupByLibrary.simpleMessage("添加笔记"),
         "already_newest_version_toast":
             MessageLookupByLibrary.simpleMessage("已经是最新版本了呦～"),
         "app_name": MessageLookupByLibrary.simpleMessage("Caritas"),
@@ -45,12 +49,14 @@ class MessageLookup extends MessageLookupByLibrary {
         "db_update_fail_toast": MessageLookupByLibrary.simpleMessage("数据更新失败！"),
         "db_update_success_toast":
             MessageLookupByLibrary.simpleMessage("数据更新完成！～"),
+        "delete": MessageLookupByLibrary.simpleMessage("删除"),
         "developer": MessageLookupByLibrary.simpleMessage("开发者 idealclover"),
         "device_push_id": MessageLookupByLibrary.simpleMessage("当前设备推送 id"),
         "donate_subtitle": MessageLookupByLibrary.simpleMessage("给傻翠买支棒棒糖吧！"),
         "donate_title": MessageLookupByLibrary.simpleMessage("投喂"),
         "easter_egg": MessageLookupByLibrary.simpleMessage(
             "感谢 @大卫 提供的 1.0 版本、图标等关键信息\n感谢 @nell nell @g9qad 的内容授权\n感谢 @阿寜寜 @流水浮灯 提供的笔记文件\n感谢每一位读到这里的人\n以此APP送给每一位努力活下去的朋友\n\n\n"),
+        "edit_note": MessageLookupByLibrary.simpleMessage("编辑笔记"),
         "export_content": m0,
         "export_title": MessageLookupByLibrary.simpleMessage("导出"),
         "export_to_file_subtitle":
@@ -62,6 +68,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "fav_del_toast": MessageLookupByLibrary.simpleMessage("已取消收藏"),
         "fav_title": MessageLookupByLibrary.simpleMessage("收藏"),
         "github_open_source": MessageLookupByLibrary.simpleMessage("GitHub 开源"),
+        "highlight_color": MessageLookupByLibrary.simpleMessage("高亮颜色"),
         "his_title": MessageLookupByLibrary.simpleMessage("历史"),
         "home_title": MessageLookupByLibrary.simpleMessage("文集"),
         "import_from_file_subtitle":
@@ -78,7 +85,17 @@ class MessageLookup extends MessageLookupByLibrary {
             "博客：https://idealclover.top\nEmail：idealclover@163.com"),
         "network_error_toast": MessageLookupByLibrary.simpleMessage("网络错误，请重试"),
         "next_article": MessageLookupByLibrary.simpleMessage("下一篇"),
-        "now_version": m1,
+        "note_added_toast": MessageLookupByLibrary.simpleMessage("笔记已添加"),
+        "note_content": MessageLookupByLibrary.simpleMessage("笔记内容"),
+        "note_content_hint": MessageLookupByLibrary.simpleMessage("写下你的想法..."),
+        "note_deleted_toast": MessageLookupByLibrary.simpleMessage("笔记已删除"),
+        "note_from_article": m1,
+        "note_list_title": MessageLookupByLibrary.simpleMessage("我的笔记"),
+        "note_updated_toast": MessageLookupByLibrary.simpleMessage("笔记已更新"),
+        "notes_empty": MessageLookupByLibrary.simpleMessage("还没有笔记，快去添加吧！"),
+        "notes_search_hint": MessageLookupByLibrary.simpleMessage("搜索笔记..."),
+        "notes_title": MessageLookupByLibrary.simpleMessage("笔记"),
+        "now_version": m2,
         "ok": MessageLookupByLibrary.simpleMessage("确认"),
         "open_in_browser_button":
             MessageLookupByLibrary.simpleMessage("浏览器内打开"),
@@ -99,6 +116,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "report_subtitle":
             MessageLookupByLibrary.simpleMessage("轻触打开QQ反馈，长按复制号码"),
         "report_title": MessageLookupByLibrary.simpleMessage("反馈"),
+        "save": MessageLookupByLibrary.simpleMessage("保存"),
+        "selected_text": MessageLookupByLibrary.simpleMessage("选中的文本"),
         "settings_title": MessageLookupByLibrary.simpleMessage("设置"),
         "share_data_subtitle":
             MessageLookupByLibrary.simpleMessage("帮助我们提升产品体验"),
@@ -134,6 +153,6 @@ class MessageLookup extends MessageLookupByLibrary {
         "update_database_subtitle":
             MessageLookupByLibrary.simpleMessage("获取最新数据"),
         "update_database_title": MessageLookupByLibrary.simpleMessage("更新数据库"),
-        "version": m2
+        "version": m3
       };
 }

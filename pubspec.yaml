@@ -40,14 +40,14 @@ dependencies:
   dio: ^5.2.1+1
   # TODO: 很离谱...不知道哪个包依赖了 file 且必须用新版本
   # https://stackoverflow.com/questions/73561012/flutter-the-method-file-create-has-fewer-named-arguments-than-those-of-overrid
-  file: ^6.1.4
+  file: ^7.0.1
   # file picker，用来导入阅读和收藏记录
-  file_picker: ^5.1.0
+  file_picker: ^10.3.8
   # markdown 库，用来把 markdown 文本转换成格式输出
 #  flutter_markdown: ^0.6.10+2
   flutter_markdown_selectionarea: ^0.6.17+1
   # 显示 taost
-  fluttertoast: ^8.0.9
+  fluttertoast: ^9.0.0
   # 用来把 html 文本转换成格式输出，针对隐私协议信息
   flutter_html: ^3.0.0-alpha.5
   # flutter 开屏图片，用来适配暗黑模式
@@ -61,15 +61,15 @@ dependencies:
   # 存储数据库
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  just_audio: ^0.9.28
+  just_audio: ^0.10.5
   # 获取包信息，用来检查更新
-  package_info_plus: ^4.0.2
+  package_info_plus: ^9.0.0
   # QR码扫描，用来导入记录
   qr_code_scanner: ^1.0.0
   # QR码生成，用来导出记录
   qr_flutter: ^4.0.0
   # share 库，用来实现应用分享功能
-  share_plus: ^7.0.2
+  share_plus: ^12.0.1
   # umeng 库，用来进行移动统计
   umeng_common_sdk: ^1.2.6
 #  umeng_common_sdk:
@@ -97,7 +97,8 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^6.0.0
+  intl_utils: ^2.8.8
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

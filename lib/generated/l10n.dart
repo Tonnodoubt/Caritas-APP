@@ -839,6 +839,176 @@ class S {
       args: [],
     );
   }
+
+  /// `Notes`
+  String get notes_title {
+    return Intl.message(
+      'Notes',
+      name: 'notes_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No notes yet. Add one now!`
+  String get notes_empty {
+    return Intl.message(
+      'No notes yet. Add one now!',
+      name: 'notes_empty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search notes...`
+  String get notes_search_hint {
+    return Intl.message(
+      'Search notes...',
+      name: 'notes_search_hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add Note`
+  String get add_note {
+    return Intl.message(
+      'Add Note',
+      name: 'add_note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit Note`
+  String get edit_note {
+    return Intl.message(
+      'Edit Note',
+      name: 'edit_note',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete`
+  String get delete {
+    return Intl.message(
+      'Delete',
+      name: 'delete',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save`
+  String get save {
+    return Intl.message(
+      'Save',
+      name: 'save',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add`
+  String get add {
+    return Intl.message(
+      'Add',
+      name: 'add',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Selected Text`
+  String get selected_text {
+    return Intl.message(
+      'Selected Text',
+      name: 'selected_text',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Note Content`
+  String get note_content {
+    return Intl.message(
+      'Note Content',
+      name: 'note_content',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Write your thoughts...`
+  String get note_content_hint {
+    return Intl.message(
+      'Write your thoughts...',
+      name: 'note_content_hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Highlight Color`
+  String get highlight_color {
+    return Intl.message(
+      'Highlight Color',
+      name: 'highlight_color',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Note added`
+  String get note_added_toast {
+    return Intl.message(
+      'Note added',
+      name: 'note_added_toast',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Note updated`
+  String get note_updated_toast {
+    return Intl.message(
+      'Note updated',
+      name: 'note_updated_toast',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Note deleted`
+  String get note_deleted_toast {
+    return Intl.message(
+      'Note deleted',
+      name: 'note_deleted_toast',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `My Notes`
+  String get note_list_title {
+    return Intl.message(
+      'My Notes',
+      name: 'note_list_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `From article: {articleTitle}`
+  String note_from_article(String articleTitle) {
+    return Intl.message(
+      'From article: $articleTitle',
+      name: 'note_from_article',
+      desc: '',
+      args: [articleTitle],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

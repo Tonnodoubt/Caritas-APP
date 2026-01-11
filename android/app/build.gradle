@@ -28,12 +28,13 @@ android {
     ndkVersion flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
 
     sourceSets {
@@ -46,15 +47,46 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        // 确保包含所有架构（特别是 arm64-v8a 用于真实设备）
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64'
+        }
+        manifestPlaceholders = [
+            applicationName     : "android.app.Application",
+            UMENG_APPKEY        : "dummy_key",
+            UMENG_MESSAGE_SECRET: "dummy_secret",
+            UMENG_CHANNEL       : "Github",
+            XIAOMI_APP_ID       : "dummy_xiaomi_id",
+            XIAOMI_APP_KEY      : "dummy_xiaomi_key",
+            OPPO_APP_KEY        : "dummy_oppo_key",
+            OPPO_APP_SECRET     : "dummy_oppo_secret",
+            MEIZU_APP_ID        : "dummy_meizu_id",
+            MEIZU_APP_KEY       : "dummy_meizu_key",
+            HUAWEI_APP_ID       : "dummy_huawei_id",
+            HONOR_APP_ID        : "dummy_honor_id",
+            VIVO_APP_KEY        : "dummy_vivo_key",
+            VIVO_APP_ID         : "dummy_vivo_id"
+        ]
     }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+        // ★★★ 关键修改：把 release 改成 debug ★★★
+            signingConfig signingConfigs.debug  
+            
+            // 下面这两个是你上次改的，保持 false 别动
+            minifyEnabled false
+            shrinkResources false
         }
     }
 }
 
 flutter {
     source '../..'
+}
+// --- 将这段代码加到文件的最底下 ---
+
+dependencies {
+    // 开启脱糖必须的依赖库
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
 }

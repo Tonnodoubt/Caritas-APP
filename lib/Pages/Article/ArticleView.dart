@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../generated/l10n.dart';
 
 // import 'package:audioplayers/audioplayers.dart';
@@ -14,7 +15,7 @@ import '../../Models/NoteProvider.dart';
 import '../../Utils/UmengUtil.dart';
 import '../../Utils/URLUtil.dart';
 import 'dart:math';
-import 'package:flutter/services.dart';
+import 'dart:async';
 
 class ArticleView extends StatefulWidget {
   final Article article;
@@ -463,19 +464,12 @@ class _ArticleViewState extends State<ArticleView> {
   Widget _buildMarkdownWithNotes() {
     final fullContent = '# ${article.title}\n    作者: ${article.author} 最近更新: ${article.lastUpdate}\n\n${article.question == "" ? "" : ">${article.question}\n\n"}${article.content}';
     
-    return GestureDetector(
-      onLongPress: () {
-        // 长按提示用户选择文本
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('请选择文本后，使用右上角的笔记按钮添加笔记'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+    return _SelectableMarkdownWithNotes(
+      content: fullContent,
+      onTextSelected: (selectedText, startOffset, endOffset) {
+        _handleTextSelection(selectedText, startOffset, endOffset);
       },
-      child: SelectionArea(
-        child: MMarkdown(fullContent),
-      ),
+      child: MMarkdown(fullContent),
     );
   }
 
@@ -590,6 +584,206 @@ class _ArticleViewState extends State<ArticleView> {
           );
         },
       ),
+    );
+  }
+}
+
+/// 可选择的 Markdown Widget，支持自动检测文本选择并弹出笔记对话框
+class _SelectableMarkdownWithNotes extends StatefulWidget {
+  final String content;
+  final Function(String selectedText, int startOffset, int endOffset) onTextSelected;
+  final Widget child;
+
+  const _SelectableMarkdownWithNotes({
+    Key? key,
+    required this.content,
+    required this.onTextSelected,
+    required this.child,
+  }) : super(key: key);
+
+  @override
+  State<_SelectableMarkdownWithNotes> createState() => _SelectableMarkdownWithNotesState();
+}
+
+class _SelectableMarkdownWithNotesState extends State<_SelectableMarkdownWithNotes> {
+  String? _selectedText;
+  int? _startOffset;
+  int? _endOffset;
+  Timer? _selectionCheckTimer;
+  bool _showAddNoteButton = false;
+  String? _lastClipboardText;
+  DateTime? _lastCheckTime;
+
+  @override
+  void initState() {
+    super.initState();
+    // 延迟启动定时器，避免影响页面加载
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        // 降低检查频率，减少性能影响
+        _selectionCheckTimer = Timer.periodic(const Duration(milliseconds: 2000), (timer) {
+          _checkTextSelection();
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _selectionCheckTimer?.cancel();
+    super.dispose();
+  }
+
+  void _checkTextSelection() async {
+    if (!mounted) return;
+    
+    // 限制检查频率，避免性能问题
+    final now = DateTime.now();
+    if (_lastCheckTime != null && now.difference(_lastCheckTime!) < const Duration(milliseconds: 1000)) {
+      return;
+    }
+    _lastCheckTime = now;
+    
+    try {
+      // 尝试从剪贴板获取最近选择的文本（使用超时避免阻塞）
+      final clipboard = await Clipboard.getData(Clipboard.kTextPlain).timeout(
+        const Duration(milliseconds: 100),
+        onTimeout: () => const ClipboardData(text: ''),
+      );
+      final clipboardText = clipboard?.text?.trim();
+      
+      // 如果剪贴板为空或与上次相同，隐藏按钮
+      if (clipboardText == null || clipboardText.isEmpty) {
+        if (_showAddNoteButton) {
+          setState(() {
+            _showAddNoteButton = false;
+            _selectedText = null;
+            _startOffset = null;
+            _endOffset = null;
+            _lastClipboardText = null;
+          });
+        }
+        return;
+      }
+
+      // 如果剪贴板内容没有变化，不处理
+      if (clipboardText == _lastClipboardText) {
+        return;
+      }
+      
+      _lastClipboardText = clipboardText;
+
+      // 只处理较短的文本（避免处理用户复制的大段文本）
+      if (clipboardText.length > 500 || clipboardText.length < 2) {
+        return;
+      }
+
+      // 使用 compute 在后台线程中搜索，避免阻塞 UI
+      // 但为了简化，先使用简单的检查
+      // 如果内容太长，限制搜索范围
+      final content = widget.content;
+      final maxSearchLength = content.length > 10000 ? 10000 : content.length;
+      final searchContent = content.substring(0, maxSearchLength);
+      
+      final startOffset = searchContent.indexOf(clipboardText);
+      if (startOffset != -1) {
+        final endOffset = startOffset + clipboardText.length;
+        
+        // 显示添加笔记按钮
+        if (mounted) {
+          setState(() {
+            _selectedText = clipboardText;
+            _startOffset = startOffset;
+            _endOffset = endOffset;
+            _showAddNoteButton = true;
+          });
+        }
+        
+        // 延迟一下，然后自动弹出笔记对话框
+        Future.delayed(const Duration(milliseconds: 2000), () {
+          if (mounted && _showAddNoteButton && _selectedText == clipboardText) {
+            // 再次确认剪贴板内容仍然匹配
+            Clipboard.getData(Clipboard.kTextPlain).timeout(
+              const Duration(milliseconds: 100),
+              onTimeout: () => const ClipboardData(text: ''),
+            ).then((currentClipboard) {
+              final currentText = currentClipboard?.text?.trim();
+              if (currentText == clipboardText && mounted && _showAddNoteButton) {
+                _handleAddNote();
+              }
+            });
+          }
+        });
+      }
+    } catch (e) {
+      // 忽略错误，继续运行
+    }
+  }
+
+  void _handleAddNote() {
+    if (_selectedText != null && _startOffset != null && _endOffset != null) {
+      widget.onTextSelected(_selectedText!, _startOffset!, _endOffset!);
+      // 隐藏按钮并清空剪贴板
+      if (mounted) {
+        setState(() {
+          _showAddNoteButton = false;
+          _selectedText = null;
+          _startOffset = null;
+          _endOffset = null;
+          _lastClipboardText = null;
+        });
+      }
+      // 清空剪贴板，避免重复触发
+      Clipboard.setData(const ClipboardData(text: '')).catchError((e) {
+        // 忽略清空剪贴板的错误
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        SelectionArea(
+          child: widget.child,
+        ),
+        // 显示添加笔记的浮动按钮
+        if (_showAddNoteButton)
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: Material(
+              elevation: 6,
+              borderRadius: BorderRadius.circular(28),
+              child: InkWell(
+                onTap: _handleAddNote,
+                borderRadius: BorderRadius.circular(28),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(28),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.note_add, color: Colors.white),
+                      const SizedBox(width: 8),
+                      Text(
+                        S.of(context).add_note,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

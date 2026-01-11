@@ -23,13 +23,17 @@ class MessageLookup extends MessageLookupByLibrary {
   static String m0(link) =>
       "> Scan QR Code to import.\n> Or visit [link](${link}) to download histories.\n> Expired 1 week later.\n> Supported by file.io";
 
-  static String m1(version) => "Now version v${version}";
+  static String m1(articleTitle) => "From article: ${articleTitle}";
 
-  static String m2(version) => "v${version}";
+  static String m2(version) => "Now version v${version}";
+
+  static String m3(version) => "v${version}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "about_title": MessageLookupByLibrary.simpleMessage("About"),
+        "add": MessageLookupByLibrary.simpleMessage("Add"),
+        "add_note": MessageLookupByLibrary.simpleMessage("Add Note"),
         "already_newest_version_toast":
             MessageLookupByLibrary.simpleMessage("Already newest version~"),
         "app_name": MessageLookupByLibrary.simpleMessage("Caritas"),
@@ -49,6 +53,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Database update fail!"),
         "db_update_success_toast":
             MessageLookupByLibrary.simpleMessage("Database updated!~"),
+        "delete": MessageLookupByLibrary.simpleMessage("Delete"),
         "developer":
             MessageLookupByLibrary.simpleMessage("Developer: idealclover"),
         "device_push_id":
@@ -58,6 +63,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "donate_title": MessageLookupByLibrary.simpleMessage("Donate"),
         "easter_egg": MessageLookupByLibrary.simpleMessage(
             "感谢 @大卫 提供的 1.0 版本、图标等关键信息\n感谢 @nell nell @g9qad 的内容授权\n感谢 @阿寜寜 @流水浮灯 提供的笔记文件\n感谢每一位读到这里的人\n以此APP送给每一位努力活下去的朋友\n\n\n"),
+        "edit_note": MessageLookupByLibrary.simpleMessage("Edit Note"),
         "export_content": m0,
         "export_title": MessageLookupByLibrary.simpleMessage("Export"),
         "export_to_file_subtitle": MessageLookupByLibrary.simpleMessage(
@@ -72,6 +78,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "fav_title": MessageLookupByLibrary.simpleMessage("Favorites"),
         "github_open_source":
             MessageLookupByLibrary.simpleMessage("GitHub OpenSource"),
+        "highlight_color":
+            MessageLookupByLibrary.simpleMessage("Highlight Color"),
         "his_title": MessageLookupByLibrary.simpleMessage("Histories"),
         "home_title": MessageLookupByLibrary.simpleMessage("Articles"),
         "import_from_file_subtitle":
@@ -91,7 +99,22 @@ class MessageLookup extends MessageLookupByLibrary {
         "network_error_toast":
             MessageLookupByLibrary.simpleMessage("Network error."),
         "next_article": MessageLookupByLibrary.simpleMessage("Next"),
-        "now_version": m1,
+        "note_added_toast": MessageLookupByLibrary.simpleMessage("Note added"),
+        "note_content": MessageLookupByLibrary.simpleMessage("Note Content"),
+        "note_content_hint":
+            MessageLookupByLibrary.simpleMessage("Write your thoughts..."),
+        "note_deleted_toast":
+            MessageLookupByLibrary.simpleMessage("Note deleted"),
+        "note_from_article": m1,
+        "note_list_title": MessageLookupByLibrary.simpleMessage("My Notes"),
+        "note_updated_toast":
+            MessageLookupByLibrary.simpleMessage("Note updated"),
+        "notes_empty":
+            MessageLookupByLibrary.simpleMessage("No notes yet. Add one now!"),
+        "notes_search_hint":
+            MessageLookupByLibrary.simpleMessage("Search notes..."),
+        "notes_title": MessageLookupByLibrary.simpleMessage("Notes"),
+        "now_version": m2,
         "ok": MessageLookupByLibrary.simpleMessage("OK"),
         "open_in_browser_button":
             MessageLookupByLibrary.simpleMessage("Open in browser."),
@@ -114,6 +137,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "report_subtitle": MessageLookupByLibrary.simpleMessage(
             "Tap to open QQ，long press to copy number."),
         "report_title": MessageLookupByLibrary.simpleMessage("Report"),
+        "save": MessageLookupByLibrary.simpleMessage("Save"),
+        "selected_text": MessageLookupByLibrary.simpleMessage("Selected Text"),
         "settings_title": MessageLookupByLibrary.simpleMessage("Settings"),
         "share_data_subtitle": MessageLookupByLibrary.simpleMessage(
             "Help us improve our products."),
@@ -156,6 +181,6 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Get newest database"),
         "update_database_title":
             MessageLookupByLibrary.simpleMessage("Get database"),
-        "version": m2
+        "version": m3
       };
 }
